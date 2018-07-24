@@ -55,13 +55,11 @@ export default class TopicFeed extends React.Component<TopicFeedProps, TopicFeed
               <div className="container">
               {Object.keys(this.state.topicNewsFeed).map((newsUrl)  => 
                 <div className="card ">
-                    
                         <img className="card-img-top" src={this.state.topicNewsFeed[newsUrl].imageUrl} style={{width:'100%'}}/>
-                    
                         <div className="card-body">
                         <h4 className="card-title"><a href={newsUrl}>{this.state.topicNewsFeed[newsUrl].title}</a></h4>
                         <p className="card-text">{this.state.topicNewsFeed[newsUrl].description}</p>
-                        <button className="btn btn-primary">Add link in note</button>
+                        <button className="btn btn-primary" data-id={newsUrl} onClick={(e)=>this.clickAddtoNote(e)}>Insert Link</button>
                         </div>
                         <br/>
                 </div> )}
@@ -118,6 +116,32 @@ export default class TopicFeed extends React.Component<TopicFeedProps, TopicFeed
             this.setState({topicNewsFeed : topicNewsFeed});
         }
         return result;
+    }
+
+    clickAddtoNote = (event) =>
+    {
+        var clickedData = this.state.topicNewsFeed[event.currentTarget.dataset.id];
+        OneNote.run(async context => {
+            var page = context.application.getActivePage();
+            page.load('title'); 
+            var pageContents = page.contents;
+            pageContents.load("id,type");
+            page.addOutline(200, 200, `<div className="card ">
+            <div className="card-body">
+            <h4 className="card-title"><a href=${clickedData.url}>${clickedData.title}</a></h4>
+            <p className="card-text">${clickedData.description}</p>
+            </div>
+            <br/>
+    </div>`);
+            
+            return context.sync().catch((error) => 
+            {
+                console.log("Error: " + error); 
+                if (error instanceof OfficeExtension.Error) { 
+                    console.log("Debug info: " + JSON.stringify(error.debugInfo)); 
+                } 
+            });
+        });
     }
 
     async fetchTweets()
