@@ -19,6 +19,7 @@ export interface TopicFeedEntry {
 export interface TopicFeedState {
     topicNewsFeed: {[url:string]: TopicFeedEntry },
     topicSearchFeed: {[url:string]: TopicFeedEntry},
+    wikiArticle: TopicFeedEntry,
     activeFeed: string
 }
 
@@ -28,6 +29,7 @@ export default class TopicFeed extends React.Component<TopicFeedProps, TopicFeed
         this.state = {
             topicNewsFeed: {},
             topicSearchFeed: {},
+            wikiArticle: null,
             activeFeed: 'topicSearchFeed'
         };
     }
@@ -43,17 +45,16 @@ export default class TopicFeed extends React.Component<TopicFeedProps, TopicFeed
         {
             return(
               <div className="container">
-                <h4>Topic</h4> 
-                {this.tabContent(this.props.wikiUrl, this.state.topicSearchFeed[this.props.wikiUrl])}
+                {this.renderWikiArticle()}
                 <h4>Search Results: {this.props.topic}</h4>
                 <ul className="nav nav-tabs">
-                    <li className="nav-item ">
-                        <a data-id= 'Web' className={"nav-link" + ('topicSearchFeed'===this.state.activeFeed ? " active": "")} href="#" onClick={() => 'topicSearchFeed'!==this.state.activeFeed ? this.setState({activeFeed: 'topicSearchFeed'}): {}}>
+                    <li className={"nav-item " + ('topicSearchFeed'===this.state.activeFeed ? " active": "")}>
+                        <a data-id= 'Web' className="nav-link" href="#" onClick={() => 'topicSearchFeed'!==this.state.activeFeed ? this.setState({activeFeed: 'topicSearchFeed'}): {}}>
                             Web
                         </a>
                     </li>
-                    <li className="nav-item ">
-                        <a data-id= 'News' className={"nav-link" + ('topicNewsFeed'===this.state.activeFeed ? " active": "")} href="#" onClick={() => 'topicNewsFeed'!==this.state.activeFeed ? this.setState({activeFeed: 'topicNewsFeed'}): {}}>
+                    <li className={"nav-item " + ('topicNewsFeed'===this.state.activeFeed ? " active": "")}>
+                        <a data-id= 'News' className="nav-link" href="#" onClick={() => 'topicNewsFeed'!==this.state.activeFeed ? this.setState({activeFeed: 'topicNewsFeed'}): {}}>
                             Trending News
                         </a>
                     </li>
@@ -80,11 +81,12 @@ export default class TopicFeed extends React.Component<TopicFeedProps, TopicFeed
             return;
         if (this.props.topic !== prevProps.topic)
         {
-            this.state = {
+            this.setState({
                 topicNewsFeed: {},
                 topicSearchFeed: {},
+                wikiArticle: null,
                 activeFeed: 'topicSearchFeed'
-            };
+            });
         }
         if (this.state.activeFeed === 'topicSearchFeed' && Object.keys(this.state.topicSearchFeed).length === 0)
             await this.fetchSearchFeed();
@@ -99,8 +101,11 @@ export default class TopicFeed extends React.Component<TopicFeedProps, TopicFeed
     }
 
     async fetchSearchFeed() {
-        let newsResults = await Fetch.CallBingSearchApi(this.props.topic)
-        this.setState({topicSearchFeed : newsResults});
+        let searchResults = await Fetch.CallBingSearchApi(this.props.topic);
+        let wikiArticleResult = searchResults[this.props.wikiUrl];
+        delete searchResults[this.props.wikiUrl];
+        this.setState({topicSearchFeed : searchResults,
+                        wikiArticle: wikiArticleResult });
     }
 
     clickAddtoNote = (event) =>
@@ -143,6 +148,19 @@ export default class TopicFeed extends React.Component<TopicFeedProps, TopicFeed
                         </div>
                         <br/>
                         </div> )
+    }
+
+    renderWikiArticle()
+    {
+        if (this.state.wikiArticle && (this.props.wikiUrl === this.state.wikiArticle.url))
+            return(
+                <div>
+                    <h4>Topic</h4> 
+                    {this.tabContent(this.props.wikiUrl, this.state.wikiArticle)}
+                </div>
+            );
+        else
+            return (<div/>);
     }
 
 

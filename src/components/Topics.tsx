@@ -29,8 +29,8 @@ export default class Topics extends React.Component<TopicsProps, TopicsState> {
             <div className="container">
                 <ul className="nav nav-tabs">
                 {Object.keys(this.state.topics).map((t) => 
-                    <li className="nav-item ">
-                        <a data-id= {t} className={"nav-link" + t===this.state.activeTopic ? " active": ""} href="#" onClick={(e) => this.click(e)}>
+                    <li className= {"nav-item" + (t===this.state.activeTopic ? " active": "") }>
+                        <a data-id= {t} className="nav-link" href="#" onClick={(e) => this.click(e)}>
                             {t}
                         </a>
                     </li>)}

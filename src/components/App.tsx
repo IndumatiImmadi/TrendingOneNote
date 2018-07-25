@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Button, ButtonType } from 'office-ui-fabric-react';
+//import { Button, ButtonType } from 'office-ui-fabric-react';
 //import Header from './Header';
 import { HeroListItem } from './HeroList';
 import Progress from './Progress';
@@ -65,7 +65,9 @@ export default class App extends React.Component<AppProps, AppState> {
 
         return (
             <div>
-                <Button className='ms-welcome__action' buttonType={ButtonType.hero} iconProps={{ iconName: 'ChevronRight' }} onClick={this.click}>Run</Button>
+                <button type="button" className="btn btn-info pull-right" onClick={this.click}>
+                    <span className="glyphicon glyphicon-refresh"></span> Refresh
+                </button>
                 <Topics content= {this.state.content} title={this.state.title}/>
             </div>
         );
