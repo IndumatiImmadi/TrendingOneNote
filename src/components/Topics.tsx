@@ -10,7 +10,7 @@ export interface TopicsProps {
 }
 
 export interface TopicsState {
-    topics: string[],
+    topics: {},
     activeTopic: string
 }
 
@@ -18,44 +18,25 @@ export default class Topics extends React.Component<TopicsProps, TopicsState> {
     constructor(props, context) {
         super(props, context);
         this.state = {
-            topics: [],
+            topics: {},
             activeTopic: ""
         };
     }
     render() {
-        if (this.props.title == null || this.state.topics == null)
+        if ( !(this.props.title  && this.state.topics) || Object.keys(this.state.topics).length === 0)
             return(<div/>);
         return (
             <div className="container">
                 <ul className="nav nav-tabs">
-                {this.state.topics.map((t) => 
+                {Object.keys(this.state.topics).map((t) => 
                     <li className="nav-item ">
                         <a data-id= {t} className={"nav-link" + t===this.state.activeTopic ? " active": ""} href="#" onClick={(e) => this.click(e)}>
                             {t}
                         </a>
                     </li>)}
                 </ul>
-                <TopicFeed topic = {this.state.activeTopic} />
+                <TopicFeed topic = {this.state.activeTopic} wikiUrl = {this.state.topics[this.state.activeTopic].url} />
           </div>
-                /*
-                <Tabs defaultActiveKey={this.state.topics[0]} onSelect={this.handleSelect} id="trending-topics" >
-                    {this.state.topics.map((t) => 
-                    <Tab eventKey={t} title={t}>
-                    </Tab>
-                    )}
-                    
-                </Tabs>*/
-           /* <div>
-            <ul class="nav nav-tabs">
-            {this.state.topics.map((t) => 
-            <li data-id = {t} key={t} className={this.state.activeTopic === t ? "on" : "off" } onClick={(e) => this.click(e)}>{t}</li>)}
-            </ul>
-            <TopicFeed topic = {this.state.activeTopic} />
-        </div>*/
-            /*<section className='ms-welcome__header ms-bgColor-neutralLighter ms-u-fadeIn500'>
-                <h1 className='ms-fontSize-su ms-fontWeight-light ms-fontColor-neutralPrimary'>{title}</h1>
-                <span className='ms-fontSize-su ms-fontWeight-light ms-fontColor-neutralPrimary'>{content}</span>
-            </section>*/
         );
     }
 
@@ -90,19 +71,19 @@ export default class Topics extends React.Component<TopicsProps, TopicsState> {
           ] })
         });
         let result = await response.json();
-        let topics = [];
+        let topics = {};
         if (result.documents.length > 0)
         {
             result.documents.forEach((document) =>
             {
                 document.entities.forEach(entity =>
                 {
-                    topics.push(entity.name);
+                    topics[entity.name] = {id: entity.wikipediaId, url: entity.wikipediaUrl};
                 })
             });
             this.setState({
-                topics : Array.from(new Set(topics)),
-                activeTopic: topics[0]
+                topics : Object.assign({}, topics, this.state.topics),
+                activeTopic: Object.keys(topics)[0]
             });
         }
     }
