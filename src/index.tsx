@@ -7,7 +7,8 @@ import App from './components/App';
 
 import './styles.less';
 import 'office-ui-fabric-react/dist/css/fabric.min.css';
-import 'bootstrap/dist/css/bootstrap.min.css'
+import 'bootstrap/dist/css/bootstrap.min.css';
+import 'font-awesome/css/font-awesome.min.css'
 
 initializeIcons();
 

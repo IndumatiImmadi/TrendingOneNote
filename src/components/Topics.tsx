@@ -29,8 +29,8 @@ export default class Topics extends React.Component<TopicsProps, TopicsState> {
             <div className="container">
                 <ul className="nav nav-tabs">
                 {Object.keys(this.state.topics).map((t) => 
-                    <li className= {"nav-item" + (t===this.state.activeTopic ? " active": "") }>
-                        <a data-id= {t} className="nav-link" href="#" onClick={(e) => this.click(e)}>
+                    <li className= {"nav-item" + (t===this.state.activeTopic ? " active": "")}>
+                        <a data-id= {t} className={"nav-link" + (t===this.state.activeTopic ? " active": "")} href="#" onClick={(e) => this.click(e)}>
                             {t}
                         </a>
                     </li>)}
@@ -38,6 +38,7 @@ export default class Topics extends React.Component<TopicsProps, TopicsState> {
                 <TopicFeed topic = {this.state.activeTopic} wikiUrl = {this.state.topics[this.state.activeTopic].url} />
           </div>
         );
+        //style="background-color:rgb(119, 25, 170)" - active
     }
 
     async componentDidMount()
@@ -48,7 +49,7 @@ export default class Topics extends React.Component<TopicsProps, TopicsState> {
     }
     async componentDidUpdate(prevProps)
     {
-        if(this.props.content === prevProps.contents || this.props.title === prevProps.title || this.props.title === "")
+        if((this.props.content === prevProps.content && this.props.title === prevProps.title) || this.props.title === "")
             return;
         await this.fetchTopics();
     }
@@ -72,7 +73,7 @@ export default class Topics extends React.Component<TopicsProps, TopicsState> {
         });
         let result = await response.json();
         let topics = {};
-        if (result.documents.length > 0)
+        if (result.documents && result.documents.length > 0)
         {
             result.documents.forEach((document) =>
             {
@@ -82,7 +83,7 @@ export default class Topics extends React.Component<TopicsProps, TopicsState> {
                 })
             });
             this.setState({
-                topics : Object.assign({}, topics, this.state.topics),
+                topics : Object.assign({}, topics),
                 activeTopic: Object.keys(topics)[0]
             });
         }

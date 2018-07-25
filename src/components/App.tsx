@@ -29,22 +29,14 @@ export default class App extends React.Component<AppProps, AppState> {
     }
 
     componentDidMount() {
-        this.setState({
-            listItems: [
-                {
-                    icon: 'Ribbon',
-                    primaryText: 'Achieve more with Office integration'
-                },
-                {
-                    icon: 'Unlock',
-                    primaryText: 'Unlock features and functionality'
-                },
-                {
-                    icon: 'Design',
-                    primaryText: 'Create and visualize like a pro'
-                }
-            ]
-        });
+        if(this.props.isOfficeInitialized && this.state.title === "")
+            this.click();
+    }
+
+    componentDidUpdate()
+    {
+        if(this.props.isOfficeInitialized && this.state.title === "")
+            this.click();
     }
 
     render() {
@@ -65,8 +57,8 @@ export default class App extends React.Component<AppProps, AppState> {
 
         return (
             <div>
-                <button type="button" className="btn btn-info pull-right" onClick={this.click}>
-                    <span className="glyphicon glyphicon-refresh"></span> Refresh
+                <button type="button" className="btn btn-info float-right" onClick={this.click}>
+                <i className="fa fa-refresh"></i> Refresh
                 </button>
                 <Topics content= {this.state.content} title={this.state.title}/>
             </div>

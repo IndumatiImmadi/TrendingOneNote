@@ -19,6 +19,7 @@ export interface TopicFeedEntry {
 export interface TopicFeedState {
     topicNewsFeed: {[url:string]: TopicFeedEntry },
     topicSearchFeed: {[url:string]: TopicFeedEntry},
+    topicImageFeed:  {[url:string]: TopicFeedEntry},
     wikiArticle: TopicFeedEntry,
     activeFeed: string
 }
@@ -29,6 +30,7 @@ export default class TopicFeed extends React.Component<TopicFeedProps, TopicFeed
         this.state = {
             topicNewsFeed: {},
             topicSearchFeed: {},
+            topicImageFeed: {},
             wikiArticle: null,
             activeFeed: 'topicSearchFeed'
         };
@@ -49,13 +51,18 @@ export default class TopicFeed extends React.Component<TopicFeedProps, TopicFeed
                 <h4>Search Results: {this.props.topic}</h4>
                 <ul className="nav nav-tabs">
                     <li className={"nav-item " + ('topicSearchFeed'===this.state.activeFeed ? " active": "")}>
-                        <a data-id= 'Web' className="nav-link" href="#" onClick={() => 'topicSearchFeed'!==this.state.activeFeed ? this.setState({activeFeed: 'topicSearchFeed'}): {}}>
+                        <a data-id= 'Web' className={ "nav-link"  + ('topicSearchFeed'===this.state.activeFeed ? " active": "")} href="#" onClick={() => 'topicSearchFeed'!==this.state.activeFeed ? this.setState({activeFeed: 'topicSearchFeed'}): {}}>
                             Web
                         </a>
                     </li>
                     <li className={"nav-item " + ('topicNewsFeed'===this.state.activeFeed ? " active": "")}>
-                        <a data-id= 'News' className="nav-link" href="#" onClick={() => 'topicNewsFeed'!==this.state.activeFeed ? this.setState({activeFeed: 'topicNewsFeed'}): {}}>
-                            Trending News
+                        <a data-id= 'News' className={ "nav-link" + ('topicNewsFeed'===this.state.activeFeed ? " active": "")} href="#" onClick={() => 'topicNewsFeed'!==this.state.activeFeed ? this.setState({activeFeed: 'topicNewsFeed'}): {}}>
+                            News
+                        </a>
+                    </li>
+                    <li className={"nav-item " + ('topicImageFeed'===this.state.activeFeed ? " active": "")}>
+                        <a data-id= 'Images' className={ "nav-link" + ('topicImageFeed'===this.state.activeFeed ? " active": "")} href="#" onClick={() => 'topicImageFeed'!==this.state.activeFeed ? this.setState({activeFeed: 'topicImageFeed'}): {}}>
+                            Images
                         </a>
                     </li>
                 </ul>  
@@ -84,6 +91,7 @@ export default class TopicFeed extends React.Component<TopicFeedProps, TopicFeed
             this.setState({
                 topicNewsFeed: {},
                 topicSearchFeed: {},
+                topicImageFeed: {},
                 wikiArticle: null,
                 activeFeed: 'topicSearchFeed'
             });
@@ -92,6 +100,8 @@ export default class TopicFeed extends React.Component<TopicFeedProps, TopicFeed
             await this.fetchSearchFeed();
         if (this.state.activeFeed === 'topicNewsFeed' && Object.keys(this.state.topicNewsFeed).length === 0)
             await this.fetchNewsFeed();
+        if (this.state.activeFeed === 'topicImageFeed' && Object.keys(this.state.topicImageFeed).length === 0)
+            await this.fetchImageFeed();
         //await this.fetchTweets()
     }
 
@@ -108,18 +118,29 @@ export default class TopicFeed extends React.Component<TopicFeedProps, TopicFeed
                         wikiArticle: wikiArticleResult });
     }
 
+    async fetchImageFeed() {
+        let searchResults = await Fetch.CallBingSearchApi(this.props.topic, "images");
+        this.setState({topicImageFeed : searchResults});
+    }
+
     clickAddtoNote = (event) =>
     {
-        var clickedData = this.state[this.state.activeFeed][event.currentTarget.dataset.id];
+        var clickedData = (this.state.wikiArticle && (this.props.wikiUrl === event.currentTarget.dataset.id)) ?
+                            this.state.wikiArticle:
+                            this.state[this.state.activeFeed][event.currentTarget.dataset.id];
         OneNote.run(async context => {
             var page = context.application.getActivePage();
             page.load('title'); 
             var pageContents = page.contents;
             pageContents.load("id,type");
+            var image = this.state.activeFeed === "topicImageFeed" ?
+                     `<img className="card-img-top img-thumbnail" src=${clickedData.imageUrl} style={{width:'100%'}}/>`
+                     : "";
             page.addOutline(200, 200, `<div className="card ">
+            ${image}
                 <div className="card-body">
                 <h4 className="card-title"><a href=${clickedData.url}>${clickedData.title}</a></h4>
-                <p className="card-text">${clickedData.description}</p>
+                <p className="card-text">${clickedData.description ? clickedData.description: ""}</p>
                 </div>
                 <br/>
             </div>`);
@@ -138,16 +159,20 @@ export default class TopicFeed extends React.Component<TopicFeedProps, TopicFeed
         if (!article)
             return ( <br/> );
         return(<div className="card">
+                    <p className="card-text"> 
+                        <button className="btn btn-info float-right" data-id={articleUrl} onClick={(e)=>this.clickAddtoNote(e)}>
+                        <i className="fa fa-plus"></i></button>
+                    </p>
                         {article.imageUrl ? 
-                            <img className="card-img-top" src={article.imageUrl} style={{width:'100%'}}/> 
+                            <img className="card-img-top img-thumbnail" src={article.imageUrl} style={{width:'100%'}}/> 
                             : <div/>}                        
                         <div className="card-body">
                         <h4 className="card-title"><a href={articleUrl}>{article.title}</a></h4>
                         <p className="card-text">{article.description}</p>
-                        <button className="btn btn-primary" data-id={articleUrl} onClick={(e)=>this.clickAddtoNote(e)}>Insert Link</button>
+                        
                         </div>
                         <br/>
-                        </div> )
+                </div> )
     }
 
     renderWikiArticle()

@@ -16,13 +16,14 @@ export async function CallBingSearchApi(searchQuery:string, endpoint?: string)
     {
         result.value.forEach((article) => 
         {
-            if (!(article.url in topicFeed)) 
+            var key = article.url || article.thumbnailUrl;
+            if (!(key in topicFeed)) 
             {
-                topicFeed[article.url] =
+                topicFeed[key] =
                     {
                         title: article.name,
-                        url: article.url,
-                        imageUrl: article.image && article.image.thumbnail && article.image.thumbnail.contentUrl ? article.image.thumbnail.contentUrl : null,
+                        url: key,
+                        imageUrl: (article.image && article.image.thumbnail && article.image.thumbnail.contentUrl ? article.image.thumbnail.contentUrl : null) || article.thumbnailUrl,
                         description: article.description ||  article.snippet
                     };
             }
