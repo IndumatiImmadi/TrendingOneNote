@@ -58,7 +58,7 @@ export default class App extends React.Component<AppProps, AppState> {
         return (
             <div>
                 <button type="button" className="btn btn-info float-right" onClick={this.click}>
-                <i className="fa fa-refresh"></i> Refresh
+                <i className="fa fa-refresh"></i>
                 </button>
                 <Topics content= {this.state.content} title={this.state.title}/>
             </div>

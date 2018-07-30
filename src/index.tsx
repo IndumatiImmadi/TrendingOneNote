@@ -14,7 +14,7 @@ initializeIcons();
 
 let isOfficeInitialized = false;
 
-const title = 'TrendingNote';
+const title = 'Insights';
 
 const render = (Component) => {
     ReactDOM.render(

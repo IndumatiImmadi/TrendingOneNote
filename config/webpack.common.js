@@ -105,13 +105,13 @@ module.exports = {
         ...WEBPACK_PLUGINS,
         new ExtractTextPlugin('[name].[hash].css'),
         new HtmlWebpackPlugin({
-            title: 'TrendingNote',
+            title: 'Insights',
             filename: 'index.html',
             template: './index.html',
             chunks: ['app', 'vendor', 'polyfills']
         }),
         new HtmlWebpackPlugin({
-            title: 'TrendingNote',
+            title: 'Insights',
             filename: 'function-file/function-file.html',
             template: '../function-file/function-file.html',
             chunks: ['function-file']

@@ -46,9 +46,16 @@ export default class TopicFeed extends React.Component<TopicFeedProps, TopicFeed
         else
         {
             return(
+                
               <div className="container">
+              <br/>
+              <h6 style={{color:"#303030", marginBottom :".2rem"}}>For Quick Understanding: </h6>
+              <hr/>
                 {this.renderWikiArticle()}
-                <h4>Search Results: {this.props.topic}</h4>
+                <br/>
+                <h6 style={{color:"#303030", marginBottom :".2rem"}}>Search Results: </h6>
+                <hr/>
+                <p hidden>{this.props.topic}</p>
                 <ul className="nav nav-tabs">
                     <li className={"nav-item " + ('topicSearchFeed'===this.state.activeFeed ? " active": "")}>
                         <a data-id= 'Web' className={ "nav-link"  + ('topicSearchFeed'===this.state.activeFeed ? " active": "")} href="#" onClick={() => 'topicSearchFeed'!==this.state.activeFeed ? this.setState({activeFeed: 'topicSearchFeed'}): {}}>
@@ -139,7 +146,7 @@ export default class TopicFeed extends React.Component<TopicFeedProps, TopicFeed
             page.addOutline(200, 200, `<div className="card ">
             ${image}
                 <div className="card-body">
-                <h4 className="card-title"><a href=${clickedData.url}>${clickedData.title}</a></h4>
+                <h6 className="card-title"><a href=${clickedData.url}>${clickedData.title}</a></h6>
                 <p className="card-text">${clickedData.description ? clickedData.description: ""}</p>
                 </div>
                 <br/>
@@ -159,15 +166,15 @@ export default class TopicFeed extends React.Component<TopicFeedProps, TopicFeed
         if (!article)
             return ( <br/> );
         return(<div className="card">
-                    <p className="card-text"> 
+                    <span className="card-text"> 
                         <button className="btn btn-info float-right" data-id={articleUrl} onClick={(e)=>this.clickAddtoNote(e)}>
                         <i className="fa fa-plus"></i></button>
-                    </p>
+                    </span>
                         {article.imageUrl ? 
                             <img className="card-img-top img-thumbnail" src={article.imageUrl} style={{width:'100%'}}/> 
                             : <div/>}                        
                         <div className="card-body">
-                        <h4 className="card-title"><a href={articleUrl}>{article.title}</a></h4>
+                        <h6 className="card-title"><a href={articleUrl}>{article.title}</a></h6>
                         <p className="card-text">{article.description}</p>
                         
                         </div>
@@ -180,7 +187,6 @@ export default class TopicFeed extends React.Component<TopicFeedProps, TopicFeed
         if (this.state.wikiArticle && (this.props.wikiUrl === this.state.wikiArticle.url))
             return(
                 <div>
-                    <h4>Topic</h4> 
                     {this.tabContent(this.props.wikiUrl, this.state.wikiArticle)}
                 </div>
             );
